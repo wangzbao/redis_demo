@@ -10,7 +10,7 @@ import redis.clients.jedis.Jedis;
  */
 @Component
 public class SeckillDemo {
-    @Value("${td}")
+    @Value("${td_statement}")
     private String td;
     private Jedis jedis = new Jedis("127.0.0.1");
 
