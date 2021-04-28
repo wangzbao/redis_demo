@@ -1,7 +1,7 @@
 package com.yolo.wz.redisdemo.list;
 
-import redis.clients.jedis.BinaryClient;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.ListPosition;
 
 import java.util.List;
 import java.util.Random;
@@ -35,7 +35,7 @@ public class TodoEventDemo {
     /**
      * 添加紧急待办事项
      */
-    public void insertTodoEvent(long userId, BinaryClient.LIST_POSITION position,  String targetEvent,String todoEvent) {
+    public void insertTodoEvent(long userId, ListPosition position, String targetEvent, String todoEvent) {
         Long linsert = jedis.linsert("todo_event::" + userId, position, targetEvent, todoEvent);
     }
 
@@ -73,7 +73,7 @@ public class TodoEventDemo {
         Random random = new Random();
         int index = random.nextInt(todoList.size());
         String targetEvent = todoList.get(index);
-        demo.insertTodoEvent(userId, BinaryClient.LIST_POSITION.BEFORE,targetEvent,"这是一个插入的代办事项");
+        demo.insertTodoEvent(userId, ListPosition.BEFORE,targetEvent,"这是一个插入的代办事项");
 
         //重新分页查询第一页
         System.out.println("第二次查询待办事项");
