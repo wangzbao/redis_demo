@@ -77,10 +77,10 @@ public class TimeOutDistributedLockDemo {
         String task_lock = demo.getValue("test_lock");
         System.out.println("数据是否过期？" + ((task_lock == null || task_lock.equals("")) ? "是" : "否"));
         System.out.println("删除前：" + demo.getValue("test_lock"));
-        demo.ublock("test_lock","test_error");
+        demo.ublock("test_lock", "test_error");
         System.out.println("不是本人删除后：" + demo.getValue("test_lock"));
 
-        demo.ublock("test_lock","test_value");
+        demo.ublock("test_lock", "test_value");
         System.out.println("是本人删除后：" + demo.getValue("test_lock"));
     }
 }
