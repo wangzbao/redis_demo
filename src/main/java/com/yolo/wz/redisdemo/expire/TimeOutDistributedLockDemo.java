@@ -1,6 +1,8 @@
 package com.yolo.wz.redisdemo.expire;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
 
 /**
  * 支持超时的分布式锁
@@ -19,9 +21,36 @@ public class TimeOutDistributedLockDemo {
 
     /**
      * 释放锁
+     * 此时需要校验是否是自己加的锁，-->身份校验
      */
-    public void ublock(String key) {
-        jedis.del(key);
+    public Boolean ublock(String key, String value) {
+//        jedis.del(key);
+        Pipeline pipeline = jedis.pipelined();
+        String response = jedis.get(key);
+
+        try {
+            pipeline.watch(key);
+
+            if (response == null || response.equals("") || response.equals("")
+                    || response.equals("null")) {
+                return true;
+            }
+
+            if (response.equals(value)) {
+                pipeline.multi();
+                pipeline.del(key);
+                pipeline.exec();
+
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            pipeline.close();
+        }
     }
 
     /**
@@ -48,7 +77,10 @@ public class TimeOutDistributedLockDemo {
         String task_lock = demo.getValue("test_lock");
         System.out.println("数据是否过期？" + ((task_lock == null || task_lock.equals("")) ? "是" : "否"));
         System.out.println("删除前：" + demo.getValue("test_lock"));
-        demo.ublock("test_lock");
-        System.out.println("删除后：" + demo.getValue("test_lock"));
+        demo.ublock("test_lock","test_error");
+        System.out.println("不是本人删除后：" + demo.getValue("test_lock"));
+
+        demo.ublock("test_lock","test_value");
+        System.out.println("是本人删除后：" + demo.getValue("test_lock"));
     }
 }
